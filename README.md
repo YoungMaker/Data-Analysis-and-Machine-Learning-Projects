@@ -5,10 +5,11 @@
 # Randy Olson's data analysis and machine learning projects
 
 © 2016 Randal S. Olson
+© 2017 Aaron D. Walsh
 
-This is a repository of teaching materials, code, and data for my data analysis and machine learning projects.
+This is a repository of teaching materials, code, and data for Randal Olson's data analysis and machine learning projects. It will include a specific parallel implementaion of a select number of his genetic algorithms. I, Aaron D. Walsh, do not take credit for the original versions of these algorithms. This repository retains the origial licensing given by Mr R. Olson.
 
-Each repository will (usually) correspond to one of the blog posts on my [web site](http://www.randalolson.com/blog/).
+Each folder corresponds to one of the blog posts on Randal Olson's [web site](http://www.randalolson.com/blog/).
 
 Be sure to check the documentation (usually in IPython Notebook format) in the directory you're interested in for the notes on the analysis, data usage terms, etc.
 
