@@ -178,7 +178,7 @@ def run_genetic_algorithm(generations=5000, population_size=100):
 
 
 if __name__ == '__main__':
-    waypoint_data = pd.read_csv("my-waypoints-dist-dur-NY.tsv", sep="\t")
+    waypoint_data = pd.read_csv("my-waypoints-dist-dur.tsv", sep="\t")
 
     for i, row in waypoint_data.iterrows():
         waypoint_distances[frozenset([row.waypoint1, row.waypoint2])] = row.distance_m
