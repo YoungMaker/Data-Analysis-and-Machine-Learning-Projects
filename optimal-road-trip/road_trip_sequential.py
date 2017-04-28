@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
 import random
+from runtime_timer import runtimeTimer
 
 waypoint_distances = {}
 waypoint_durations = {}
 all_waypoints = set()
-
 
 def compute_fitness(solution):
     """
@@ -97,6 +97,13 @@ def run_genetic_algorithm(generations=5000, population_size=100):
         `generations` and `population_size` must be a multiple of 10.
     """
 
+    #avg runtime accumulators
+    fitness_time = 0
+    mutate_time = 0
+    r_timer = runtimeTimer()
+    total_timer = runtimeTimer()
+    total_timer.start()
+
     population_subset_size = int(population_size / 10.)
     generations_10pct = int(generations / 10.)
 
@@ -106,6 +113,7 @@ def run_genetic_algorithm(generations=5000, population_size=100):
     # For `generations` number of repetitions...
     for generation in range(generations):
 
+        r_timer.start()
         # Compute the fitness of the entire current population
         population_fitness = {}
 
@@ -114,6 +122,10 @@ def run_genetic_algorithm(generations=5000, population_size=100):
                 continue
 
             population_fitness[agent_genome] = compute_fitness(agent_genome)
+
+        fitness_time += r_timer.stop()
+
+        r_timer.start()
 
         # Take the top 10% shortest road trips and produce offspring each from them
         new_population = []
@@ -142,10 +154,22 @@ def run_genetic_algorithm(generations=5000, population_size=100):
         for i in range(len(population))[::-1]:
             del population[i]
 
+        mutate_time += r_timer.stop()
+
         population = new_population
 
+    total_time = total_timer.stop()
+    print "total runtime was %f seconds\n" % total_time
+    print "\t total fitness time was %0.2f " % (fitness_time*1000)
+    print "\t total mutation time was %0.2f milliseconds" % (mutate_time*1000)
+    print "\t average fitness time was %0.2f milliseconds" % ((fitness_time / generations)*1000)
+    print "\t average mutate time was %0.2f milliseconds" % ((mutate_time / generations)*1000)
+    print "\t %0.3f percent of the total runtime was fitness" % ((fitness_time / total_time) * 100)
+    print "\t %0.3f percent of the total runtime was mutations" % ((mutate_time / total_time) * 100)
+
+
 if __name__ == '__main__':
-    waypoint_data = pd.read_csv("my-waypoints-dist-dur.tsv", sep="\t")
+    waypoint_data = pd.read_csv("my-waypoints-dist-dur-NY.tsv", sep="\t")
 
     for i, row in waypoint_data.iterrows():
         waypoint_distances[frozenset([row.waypoint1, row.waypoint2])] = row.distance_m

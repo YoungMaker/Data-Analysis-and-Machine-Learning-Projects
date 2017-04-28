@@ -13,19 +13,20 @@ import os.path
 import random
 import webbrowser
 
-GOOGLE_MAPS_API_KEY = "Your Key Here"
-waypoints_file = "my-waypoints-dist-dur.tsv"
+
+GOOGLE_MAPS_API_KEY = "API_KEY_HERE"
+waypoints_file = "my-waypoints-dist-dur-NY.tsv"
 
 #This is the general filename - as shorter routes are discovered the Population fitness score will be inserted into the filename
 #so that interim results are saved for comparision.  The actual filenames using the default below will be:
 #Output_<Population Fitness Score>.html 
 output_file = 'Output.html'
 
-#parameters for the Genetic algoritim
-thisRunGenerations=5000
+#parameters for the Genetic algorithm
+thisRunGenerations=50000
 thisRunPopulation_size=100
 
-
+"""
 all_waypoints = ["USS Alabama, Battleship Parkway, Mobile, AL",
                  "Grand Canyon National Park, Arizona",
                  "Toltec Mounds, Scott, AR",
@@ -76,6 +77,25 @@ all_waypoints = ["USS Alabama, Battleship Parkway, Mobile, AL",
                  "Lost World Caverns, Lewisburg, WV",
                  "Taliesin, County Road C, Spring Green, Wisconsin",
                  "Yellowstone National Park, WY 82190"]
+
+
+"""
+
+all_waypoints = ["336 East 50th Street, New York, NY 10022",
+                 "Rockafeller Center, 45 Rockefeller Plaza, New York, NY 10111",
+                 "Charging Bull, New York, New York",
+                 "1 World Trade Center, New York, NY",
+                 "Battery Park, New York, NY",
+                 "New York Public Library, 476 5th Ave, New York, NY 10018",
+                 "Times Square New York, New York 10036",
+                 "Empire State Building, New York, NY",
+                 "The Museum of Modern Art, New York, NY",
+                 "Saks Fifth Avenue, 611 5th Ave, New York, NY 10021",
+                 "Flatiron Building, New York, NY",
+                 "Grand Central Terminal, New York, NY",
+                 "The High Line, New York, NY",
+                 "Intrepid Sea, Air & Space Museum, New York, NY"]
+
 
 def CreateOptimalRouteHtmlFile(optimal_route, distance, display=True):
     optimal_route = list(optimal_route)
@@ -370,7 +390,7 @@ if __name__ == '__main__':
             try:
                 route = gmaps.distance_matrix(origins=[waypoint1],
                                               destinations=[waypoint2],
-                                              mode="driving", # Change to "walking" for walking directions,
+                                              mode="walking", # Change to "walking" for walking directions,
                                                               # "bicycling" for biking directions, etc.
                                               language="English",
                                               units="metric")
@@ -385,7 +405,8 @@ if __name__ == '__main__':
                 waypoint_durations[frozenset([waypoint1, waypoint2])] = duration
         
             except Exception as e:
-                print("Error with finding the route between %s and %s." % (waypoint1, waypoint2))
+               # print("Error with finding the route between %s and %s." % (waypoint1, waypoint2))
+                print(e)
         
         print("Saving Waypoints")
         with open(waypoints_file, "w") as out_file:
