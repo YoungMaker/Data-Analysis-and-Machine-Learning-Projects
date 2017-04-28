@@ -1,0 +1,21 @@
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+5000 generations, 100 population_size and 14 inputs
+total runtime was 3.450163 seconds
+	 total fitness time was 1812.78 
+	 total mutation time was 1633.08 milliseconds
+	 average fitness time was 0.36 milliseconds
+	 average mutate time was 0.33 milliseconds
+	 52.542 percent of the total runtime was fitness
+	 47.334 percent of the total runtime was mutations
+ best solution was fitness 17368
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+5000 generations, 100 population_size and 14 inputs
+total runtime was 3.517173 seconds
+	 total fitness time was 1820.11 
+	 total mutation time was 1692.51 milliseconds
+	 average fitness time was 0.36 milliseconds
+	 average mutate time was 0.34 milliseconds
+	 51.749 percent of the total runtime was fitness
+	 48.121 percent of the total runtime was mutations
+ best solution was fitness 17368

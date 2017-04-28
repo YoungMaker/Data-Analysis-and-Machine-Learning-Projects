@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import random
 from runtime_timer import runtimeTimer
+import cpuinfo
 
 waypoint_distances = {}
 waypoint_durations = {}
@@ -97,7 +98,9 @@ def run_genetic_algorithm(generations=5000, population_size=100):
         `generations` and `population_size` must be a multiple of 10.
     """
 
-    #avg runtime accumulators
+    best = 0
+
+    #runtime accumulators
     fitness_time = 0
     mutate_time = 0
     r_timer = runtimeTimer()
@@ -136,6 +139,7 @@ def run_genetic_algorithm(generations=5000, population_size=100):
                 print("Generation %d best: %d | Unique genomes: %d" % (generation,
                                                                        population_fitness[agent_genome],
                                                                        len(population_fitness)))
+                best = population_fitness[agent_genome]
                 print(agent_genome)
                 print("")
 
@@ -158,14 +162,19 @@ def run_genetic_algorithm(generations=5000, population_size=100):
 
         population = new_population
 
+    out_file = open("runtime_data.txt", 'a')
+
     total_time = total_timer.stop()
-    print "total runtime was %f seconds\n" % total_time
-    print "\t total fitness time was %0.2f " % (fitness_time*1000)
-    print "\t total mutation time was %0.2f milliseconds" % (mutate_time*1000)
-    print "\t average fitness time was %0.2f milliseconds" % ((fitness_time / generations)*1000)
-    print "\t average mutate time was %0.2f milliseconds" % ((mutate_time / generations)*1000)
-    print "\t %0.3f percent of the total runtime was fitness" % ((fitness_time / total_time) * 100)
-    print "\t %0.3f percent of the total runtime was mutations" % ((mutate_time / total_time) * 100)
+    out_file.write("\n\ngenetic algorithm was run on CPU %s\n" % cpuinfo.get_cpu_info()['brand'])
+    out_file.write("%i generations, %i population_size and %i inputs\n" % (generations, population_size, len(all_waypoints)))
+    out_file.write( "total runtime was %f seconds\n" % total_time)
+    out_file.write( "\t total fitness time was %0.2f \n" % (fitness_time*1000))
+    out_file.write( "\t total mutation time was %0.2f milliseconds\n" % (mutate_time*1000))
+    out_file.write( "\t average fitness time was %0.2f milliseconds\n" % ((fitness_time / generations)*1000))
+    out_file.write( "\t average mutate time was %0.2f milliseconds\n" % ((mutate_time / generations)*1000))
+    out_file.write( "\t %0.3f percent of the total runtime was fitness\n" % ((fitness_time / total_time) * 100))
+    out_file.write( "\t %0.3f percent of the total runtime was mutations\n" % ((mutate_time / total_time) * 100))
+    out_file.write(" best solution was fitness %d" % best )
 
 
 if __name__ == '__main__':
