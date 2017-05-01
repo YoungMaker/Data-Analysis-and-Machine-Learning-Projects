@@ -8,6 +8,9 @@ waypoint_distances = {}
 waypoint_durations = {}
 all_waypoints = set()
 
+names_lookup = {}
+adj_matrix = None #this will be a num
+
 def compute_fitness(solution):
     """
         This function returns the total distance traveled on the current road trip.
@@ -25,6 +28,26 @@ def compute_fitness(solution):
 
     return solution_fitness
 
+def compute_adj_matrix_fitness(solution):
+    """
+        This function returns the total distance traveled on the current road trip.
+
+        The genetic algorithm will favor road trips that have shorter
+        total distances traveled.
+        
+        This implementation uses a numpy adjacency matrix instead of the frozen set. 
+        Saves a lot of time.
+    """
+
+    solution_fitness = 0.0
+
+    for index in range(len(solution)):
+        waypoint1 = solution[index - 1]
+        waypoint2 = solution[index]
+        solution_fitness += adj_matrix[waypoint1, waypoint2]
+
+    return solution_fitness
+
 
 def generate_random_agent():
     """
@@ -33,7 +56,24 @@ def generate_random_agent():
 
     new_random_agent = list(all_waypoints)
     random.shuffle(new_random_agent)
+    #print tuple(new_random_agent)
     return tuple(new_random_agent)
+
+def generate_random_agent_keys():
+    """
+        Creates a random road trip from the waypoints, using numerical keys rather than strings.
+    """
+
+    new_random_agent = list(all_waypoints)
+    random.shuffle(new_random_agent)
+
+    converted_set = list()
+    for key in new_random_agent:
+        converted_set.append(names_lookup[key])
+
+
+   # print converted_set
+    return tuple(converted_set)
 
 
 def mutate_agent(agent_genome, max_mutations=3):
@@ -87,7 +127,7 @@ def generate_random_population(pop_size):
 
     random_population = []
     for agent in range(pop_size):
-        random_population.append(generate_random_agent())
+        random_population.append(generate_random_agent_keys())
     return random_population
 
 
@@ -124,7 +164,8 @@ def run_genetic_algorithm(generations=5000, population_size=100):
             if agent_genome in population_fitness:
                 continue
 
-            population_fitness[agent_genome] = compute_fitness(agent_genome)
+            #population_fitness[agent_genome] = compute_fitness(agent_genome)
+            population_fitness[agent_genome] = compute_adj_matrix_fitness(agent_genome)
 
         fitness_time += r_timer.stop()
 
@@ -162,7 +203,7 @@ def run_genetic_algorithm(generations=5000, population_size=100):
 
         population = new_population
 
-    out_file = open("runtime_data_sequential_5000gen_50inputs.txt", 'a')
+    out_file = open("runtime_data-np_5000gen_50inputs.txt", 'a')
 
     total_time = total_timer.stop()
     out_file.write("\n\ngenetic algorithm was run on CPU %s\n" % cpuinfo.get_cpu_info()['brand'])
@@ -179,12 +220,38 @@ def run_genetic_algorithm(generations=5000, population_size=100):
 
 if __name__ == '__main__':
     waypoint_data = pd.read_csv("my-waypoints-dist-dur.tsv", sep="\t")
+    #print(waypoint_data)
+
+
+    waypoint_id = 0
+    for i, row in waypoint_data.iterrows():
+        if not names_lookup.has_key(row.waypoint1):
+            names_lookup[row.waypoint1] = waypoint_id
+            waypoint_id += 1
+        if not names_lookup.has_key(row.waypoint2):
+            names_lookup[row.waypoint2] = waypoint_id
+            waypoint_id += 1
+
+    # for wp_key in names_lookup:
+    #     print "%i | %s \n" % (names_lookup[wp_key], wp_key)
+
+    num_items = len(names_lookup)
+
+    adj_matrix = np.zeros(shape=[num_items, num_items ]) #CHANGE BACK TO EMPTY
 
     for i, row in waypoint_data.iterrows():
+        #TODO: translate waypoints and place dist in adj_matrix
+        wp1_key = names_lookup[row.waypoint1]
+        wp2_key = names_lookup[row.waypoint2]
+
+        adj_matrix[wp1_key][wp2_key] = row.distance_m
+        adj_matrix[wp2_key][wp1_key] = row.distance_m
+
         waypoint_distances[frozenset([row.waypoint1, row.waypoint2])] = row.distance_m
         waypoint_durations[frozenset([row.waypoint1, row.waypoint2])] = row.duration_s
         all_waypoints.update([row.waypoint1, row.waypoint2])
 
-    #print(waypoint_distances)
+   # print adj_matrix[13,1]
+
 
     run_genetic_algorithm(5000, 100)

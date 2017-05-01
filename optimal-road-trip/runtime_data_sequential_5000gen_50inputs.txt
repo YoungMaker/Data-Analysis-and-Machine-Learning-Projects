@@ -1,0 +1,56 @@
+
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+5000 generations, 100 population_size and 50 inputs
+total runtime was 10.752170 seconds
+	 total fitness time was 8675.41 
+	 total mutation time was 2070.40 milliseconds
+	 average fitness time was 1.74 milliseconds
+	 average mutate time was 0.41 milliseconds
+	 80.685 percent of the total runtime was fitness
+	 19.256 percent of the total runtime was mutations
+ best solution was fitness 22839620
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+5000 generations, 100 population_size and 50 inputs
+total runtime was 10.456467 seconds
+	 total fitness time was 8437.82 
+	 total mutation time was 2012.44 milliseconds
+	 average fitness time was 1.69 milliseconds
+	 average mutate time was 0.40 milliseconds
+	 80.695 percent of the total runtime was fitness
+	 19.246 percent of the total runtime was mutations
+ best solution was fitness 23047711
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+5000 generations, 100 population_size and 50 inputs
+total runtime was 10.535568 seconds
+	 total fitness time was 8523.14 
+	 total mutation time was 2006.14 milliseconds
+	 average fitness time was 1.70 milliseconds
+	 average mutate time was 0.40 milliseconds
+	 80.899 percent of the total runtime was fitness
+	 19.042 percent of the total runtime was mutations
+ best solution was fitness 23512363
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+5000 generations, 100 population_size and 50 inputs
+total runtime was 10.466351 seconds
+	 total fitness time was 8441.34 
+	 total mutation time was 2018.99 milliseconds
+	 average fitness time was 1.69 milliseconds
+	 average mutate time was 0.40 milliseconds
+	 80.652 percent of the total runtime was fitness
+	 19.290 percent of the total runtime was mutations
+ best solution was fitness 22324940
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+5000 generations, 100 population_size and 50 inputs
+total runtime was 10.455455 seconds
+	 total fitness time was 8442.71 
+	 total mutation time was 2006.70 milliseconds
+	 average fitness time was 1.69 milliseconds
+	 average mutate time was 0.40 milliseconds
+	 80.749 percent of the total runtime was fitness
+	 19.193 percent of the total runtime was mutations
+ best solution was fitness 23474134

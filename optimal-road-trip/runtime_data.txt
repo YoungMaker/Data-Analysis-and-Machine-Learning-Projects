@@ -85,3 +85,47 @@ total runtime was 20.512086 seconds
 	 80.851 percent of the total runtime was fitness
 	 19.098 percent of the total runtime was mutations
  best solution was fitness 23513605
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+10000 generations, 100 population_size and 50 inputs
+total runtime was 22.678816 seconds
+	 total fitness time was 18213.46 
+	 total mutation time was 4370.74 milliseconds
+	 average fitness time was 1.82 milliseconds
+	 average mutate time was 0.44 milliseconds
+	 80.310 percent of the total runtime was fitness
+	 19.272 percent of the total runtime was mutations
+ best solution was fitness 23030636
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+10000 generations, 100 population_size and 50 inputs
+total runtime was 44.789555 seconds
+	 total fitness time was 28116.47 
+	 total mutation time was 16550.50 milliseconds
+	 average fitness time was 2.81 milliseconds
+	 average mutate time was 1.66 milliseconds
+	 62.775 percent of the total runtime was fitness
+	 36.952 percent of the total runtime was mutations
+ best solution was fitness 22684937
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+10000 generations, 100 population_size and 14 inputs
+total runtime was 7.025418 seconds
+	 total fitness time was 3675.60 
+	 total mutation time was 3326.39 milliseconds
+	 average fitness time was 0.37 milliseconds
+	 average mutate time was 0.33 milliseconds
+	 52.319 percent of the total runtime was fitness
+	 47.348 percent of the total runtime was mutations
+ best solution was fitness 17368
+
+genetic algorithm was run on CPU Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+10000 generations, 100 population_size and 14 inputs
+total runtime was 6.966304 seconds
+	 total fitness time was 3648.96 
+	 total mutation time was 3308.23 milliseconds
+	 average fitness time was 0.36 milliseconds
+	 average mutate time was 0.33 milliseconds
+	 52.380 percent of the total runtime was fitness
+	 47.489 percent of the total runtime was mutations
+ best solution was fitness 17368
