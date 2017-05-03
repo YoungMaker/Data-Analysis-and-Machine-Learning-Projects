@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 import random
 from runtime_timer import runtimeTimer
-from numba import vectorize, cuda, jit
+from numba import jit
+from os import path as pth
 #import cpuinfo
 
 waypoint_distances = {}
@@ -10,7 +11,7 @@ waypoint_durations = {}
 all_waypoints = set()
 
 names_lookup = {}
-adj_matrix = None #this will be a num
+adj_matrix = np.empty(shape=[0,0])
 
 def compute_fitness(solution):
     """
@@ -29,7 +30,7 @@ def compute_fitness(solution):
 
     return solution_fitness
 
-@jit(target="cpu")
+
 def compute_adj_matrix_fitness(solution):
     """
         This function returns the total distance traveled on the current road trip.
@@ -50,6 +51,26 @@ def compute_adj_matrix_fitness(solution):
 
     return solution_fitness
 
+@jit(target="cpu")
+def compute_adj_matrix_fitness_CPU(solution):
+    """
+        This function returns the total distance traveled on the current road trip.
+
+        The genetic algorithm will favor road trips that have shorter
+        total distances traveled.
+
+        This implementation uses a numpy adjacency matrix instead of the frozen set. 
+        Saves a lot of time.
+    """
+
+    solution_fitness = 0.0
+
+    for index in range(len(solution)):
+        waypoint1 = solution[index - 1]
+        waypoint2 = solution[index]
+        solution_fitness += adj_matrix[waypoint1, waypoint2]
+
+    return solution_fitness
 
 def generate_random_agent():
     """
@@ -168,8 +189,8 @@ def run_genetic_algorithm(generations=5000, population_size=100):
             if agent_genome in population_fitness:
                 continue
             np_genome = np.array(agent_genome, dtype=int)
-            #population_fitness[agent_genome] = compute_fitness(agent_genome)
-            population_fitness[agent_genome] = compute_adj_matrix_fitness(np_genome) #cpu JIT
+            population_fitness[agent_genome] = compute_adj_matrix_fitness(agent_genome)
+            #population_fitness[agent_genome] = compute_adj_matrix_fitness_CPU(np_genome) #cpu JIT
 
         fitness_time += r_timer.stop()
 
@@ -207,26 +228,56 @@ def run_genetic_algorithm(generations=5000, population_size=100):
 
         population = new_population
 
-    out_file = open("runtime_data-np_5000gen_50inputs.txt", 'a')
-
     total_time = total_timer.stop()
-    #out_file.write("\n\ngenetic algorithm was run on CPU %s\n" % cpuinfo.get_cpu_info()['brand'])
-    out_file.write("\n\ngenetic algorithm was run on CPU \n")
-    out_file.write("%i generations, %i population_size and %i inputs\n" % (generations, population_size, len(all_waypoints)))
-    out_file.write( "total runtime was %f seconds\n" % total_time)
-    out_file.write( "\t total fitness time was %0.2f \n" % (fitness_time*1000))
-    out_file.write( "\t total mutation time was %0.2f milliseconds\n" % (mutate_time*1000))
-    out_file.write( "\t average fitness time was %0.2f milliseconds\n" % ((fitness_time / generations)*1000))
-    out_file.write( "\t average mutate time was %0.2f milliseconds\n" % ((mutate_time / generations)*1000))
-    out_file.write( "\t %0.3f percent of the total runtime was fitness\n" % ((fitness_time / total_time) * 100))
-    out_file.write( "\t %0.3f percent of the total runtime was mutations\n" % ((mutate_time / total_time) * 100))
-    out_file.write(" best solution was fitness %d" % best )
+    write_to_txt(total_time, generations, population_size, len(all_waypoints), fitness_time, mutate_time, best, fname="runtime_data_np_exp_")
+    write_to_csv(total_time, generations, population_size, len(all_waypoints), fitness_time, mutate_time, best, fname="runtime_data_np_exp_")
 
 
-if __name__ == '__main__':
-    waypoint_data = pd.read_csv("my-waypoints-dist-dur.tsv", sep="\t")
-    #print(waypoint_data)
 
+
+def write_to_txt(total_time, generations, population_size, input_size, fitness_time, mutate_time, best_fitness,
+                 fname="runtime_data.txt", mode='cpu'):
+    out_file = open(fname + ".txt", 'a')
+    if mode == 'cpu':
+        out_file.write("\n\ngenetic algorithm was run on CPU\n")
+    else:
+        out_file.write("\n\ngenetic algorithm was run on GPU\n")
+
+    out_file.write("%i generations, %i population_size and %i inputs\n" % (generations, population_size, input_size))
+    out_file.write("total runtime was %f seconds\n" % total_time)
+    out_file.write("\t total fitness time was %0.2f \n" % (fitness_time * 1000))
+    out_file.write("\t total mutation time was %0.2f milliseconds\n" % (mutate_time * 1000))
+    out_file.write("\t average fitness time was %0.2f milliseconds\n" % ((fitness_time / generations) * 1000))
+    out_file.write("\t average mutate time was %0.2f milliseconds\n" % ((mutate_time / generations) * 1000))
+    out_file.write("\t %0.3f percent of the total runtime was fitness\n" % ((fitness_time / total_time) * 100))
+    out_file.write("\t %0.3f percent of the total runtime was mutations\n" % ((mutate_time / total_time) * 100))
+    out_file.write(" best solution was fitness %d" % best_fitness)
+    out_file.close()
+
+
+def write_to_csv(total_time, generations, population_size, input_size, fitness_time, mutate_time, best_fitness,
+                 fname="runtime_data", mode='cpu'):
+
+    if not pth.isfile(fname + ".csv"):
+        out_file = open(fname + ".csv", 'a')
+        out_file.write("input size, generations, population size, " +
+                      "total runtime, fitness runtime, mutate runtime," +
+                       "avg fitness time, avg mutate time, % fitness time, % mutate time, best genome\n")
+        out_file.close()
+
+    out_file = open(fname + ".csv", 'a')
+
+    out_file.write("%i,%i,%i,%f,%0.1f,%0.1f,%0.4f,%0.4f,%0.4f,%f,%i\n"
+            % (input_size, generations, population_size,
+               total_time, (fitness_time*1000), (mutate_time*1000),
+               ((fitness_time / generations) * 1000),((mutate_time / generations) * 1000),
+               ((fitness_time / total_time) * 100), ((mutate_time / total_time) * 100), best_fitness ))
+    out_file.close()
+
+
+def run_TSP_solver(dataset_num) :
+    global waypoint_data, adj_matrix, names_lookup, all_waypoints, waypoint_distances, waypoint_durations
+    waypoint_data = pd.read_csv("my-waypoints_auto" + str(dataset_num) + ".tsv", sep="\t")
 
     waypoint_id = 0
     for i, row in waypoint_data.iterrows():
@@ -242,10 +293,10 @@ if __name__ == '__main__':
 
     num_items = len(names_lookup)
 
-    adj_matrix = np.zeros(shape=[num_items, num_items ])
+    adj_matrix = np.zeros(shape=[num_items, num_items])
 
     for i, row in waypoint_data.iterrows():
-        #TODO: translate waypoints and place dist in adj_matrix
+        # translate waypoints and place dist in adj_matrix
         wp1_key = names_lookup[row.waypoint1]
         wp2_key = names_lookup[row.waypoint2]
 
@@ -256,7 +307,12 @@ if __name__ == '__main__':
         waypoint_durations[frozenset([row.waypoint1, row.waypoint2])] = row.duration_s
         all_waypoints.update([row.waypoint1, row.waypoint2])
 
-   # print adj_matrix[13,1]
-
+        # print adj_matrix[13,1]
 
     run_genetic_algorithm(5000, 100)
+
+if __name__ == '__main__':
+  cnt = 400
+  while cnt <= 1000:
+      run_TSP_solver(cnt)
+      cnt +=200
