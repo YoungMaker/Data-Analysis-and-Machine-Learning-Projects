@@ -54,3 +54,81 @@ total runtime was 6.740571 seconds
 	 70.548 percent of the total runtime was fitness
 	 29.364 percent of the total runtime was mutations
  best solution was fitness 22195464
+
+genetic algorithm was run on CPU 
+5000 generations, 100 population_size and 50 inputs
+total runtime was 7.281871 seconds
+	 total fitness time was 4995.17 
+	 total mutation time was 2281.20 milliseconds
+	 average fitness time was 1.00 milliseconds
+	 average mutate time was 0.46 milliseconds
+	 68.597 percent of the total runtime was fitness
+	 31.327 percent of the total runtime was mutations
+ best solution was fitness 22360880
+
+genetic algorithm was run on CPU 
+5000 generations, 100 population_size and 50 inputs
+total runtime was 8.820804 seconds
+	 total fitness time was 5893.06 
+	 total mutation time was 2922.00 milliseconds
+	 average fitness time was 1.18 milliseconds
+	 average mutate time was 0.58 milliseconds
+	 66.809 percent of the total runtime was fitness
+	 33.126 percent of the total runtime was mutations
+ best solution was fitness 22215870
+
+genetic algorithm was run on CPU 
+5000 generations, 100 population_size and 50 inputs
+total runtime was 3.751073 seconds
+	 total fitness time was 1494.48 
+	 total mutation time was 2250.79 milliseconds
+	 average fitness time was 0.30 milliseconds
+	 average mutate time was 0.45 milliseconds
+	 39.841 percent of the total runtime was fitness
+	 60.004 percent of the total runtime was mutations
+ best solution was fitness 23030042
+
+genetic algorithm was run on CPU 
+5000 generations, 100 population_size and 50 inputs
+total runtime was 3.746638 seconds
+	 total fitness time was 1507.99 
+	 total mutation time was 2232.90 milliseconds
+	 average fitness time was 0.30 milliseconds
+	 average mutate time was 0.45 milliseconds
+	 40.249 percent of the total runtime was fitness
+	 59.598 percent of the total runtime was mutations
+ best solution was fitness 22324940
+
+genetic algorithm was run on CPU 
+5000 generations, 100 population_size and 50 inputs
+total runtime was 3.737042 seconds
+	 total fitness time was 1490.09 
+	 total mutation time was 2241.59 milliseconds
+	 average fitness time was 0.30 milliseconds
+	 average mutate time was 0.45 milliseconds
+	 39.874 percent of the total runtime was fitness
+	 59.983 percent of the total runtime was mutations
+ best solution was fitness 23169947
+
+genetic algorithm was run on CPU 
+5000 generations, 100 population_size and 50 inputs
+total runtime was 3.874584 seconds
+	 total fitness time was 1598.18 
+	 total mutation time was 2270.72 milliseconds
+	 average fitness time was 0.32 milliseconds
+	 average mutate time was 0.45 milliseconds
+	 41.248 percent of the total runtime was fitness
+	 58.606 percent of the total runtime was mutations
+ best solution was fitness 24186165
+
+genetic algorithm was run on CPU 
+5000 generations, 100 population_size and 50 inputs
+total runtime was 3.917471 seconds
+	 total fitness time was 1612.91 
+	 total mutation time was 2298.08 milliseconds
+	 average fitness time was 0.32 milliseconds
+	 average mutate time was 0.46 milliseconds
+	 41.172 percent of the total runtime was fitness
+	 58.662 percent of the total runtime was mutations
+ best solution was fitness 22841454
+

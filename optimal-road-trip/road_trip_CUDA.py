@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 import random
 from runtime_timer import runtimeTimer
-import cpuinfo
+from numba import vectorize, cuda, jit
+#import cpuinfo
 
 waypoint_distances = {}
 waypoint_durations = {}
@@ -28,6 +29,7 @@ def compute_fitness(solution):
 
     return solution_fitness
 
+@jit(target="cpu")
 def compute_adj_matrix_fitness(solution):
     """
         This function returns the total distance traveled on the current road trip.
@@ -48,16 +50,27 @@ def compute_adj_matrix_fitness(solution):
 
     return solution_fitness
 
-
-def generate_random_agent():
+@jit(target="gpu")
+def compute_adj_matrix_fitness_CUDA(population, result, d_adj_matrix, length_outer, length_inner):
     """
-        Creates a random road trip from the waypoints.
+        This function returns the total distance traveled on the current road trip.
+
+        The genetic algorithm will favor road trips that have shorter
+        total distances traveled.
+
+        This implementation uses a numpy adjacency matrix and utilizes the GPU
     """
 
-    new_random_agent = list(all_waypoints)
-    random.shuffle(new_random_agent)
-    #print tuple(new_random_agent)
-    return tuple(new_random_agent)
+    i = cuda.grid(1) #computes grid index
+    if i < length_outer:
+        counter = 0.0
+        for index in range(length_inner):
+            waypoint1 = population[i][index - 1]
+            waypoint2 = population[i][index]
+            counter +=  d_adj_matrix[waypoint1, waypoint2]
+
+        result[i] = counter
+
 
 def generate_random_agent_keys():
     """
@@ -67,13 +80,14 @@ def generate_random_agent_keys():
     new_random_agent = list(all_waypoints)
     random.shuffle(new_random_agent)
 
-    converted_set = list()
+    converted_set = np.array(new_random_agent)
+    i = 0
     for key in new_random_agent:
-        converted_set.append(names_lookup[key])
+        converted_set[i] = names_lookup[key]
+        i+= 1
 
-
-   # print converted_set
-    return tuple(converted_set)
+    #print converted_set
+    return converted_set
 
 
 def mutate_agent(agent_genome, max_mutations=3):
@@ -138,6 +152,9 @@ def run_genetic_algorithm(generations=5000, population_size=100):
         `generations` and `population_size` must be a multiple of 10.
     """
 
+    #todo: copy adj_matrix to device, it does not get modified.
+    d_adj_matrix = cuda.to_device(adj_matrix)
+
     best = 0
 
     #runtime accumulators
@@ -160,14 +177,40 @@ def run_genetic_algorithm(generations=5000, population_size=100):
         # Compute the fitness of the entire current population
         population_fitness = {}
 
-        for agent_genome in population:
-            if agent_genome in population_fitness:
-                continue
 
-            #population_fitness[agent_genome] = compute_fitness(agent_genome)
-            population_fitness[agent_genome] = compute_adj_matrix_fitness(agent_genome)
+        #print population
+        #convert python type to np array
+        np_population = np.zeros(shape=[len(population), len(all_waypoints)], dtype=int)
+        #print np_population
+        idx = 0
+        for agent_genome in population:
+            np_population[idx] = agent_genome
+            idx +=1
+
+        # print np_population
+        # print np_population[0][0]
+
+        griddim = len(population)
+        blockdim = 1 #start with only one thread per block
+
+        output = np.zeros(shape=[len(population), 1])
+        # #TODO: copy data to device from host.
+        d_input = cuda.to_device(np_population)
+        d_output = cuda.to_device(output)
+
+        compute_adj_matrix_fitness_CUDA[griddim, blockdim](d_input, d_output, d_adj_matrix, len(population), len(all_waypoints))
+        d_output.to_host()
+
+        #todo: convert this back to python types.
+        print output[10]
+
+        # idx = 0
+        # for agent_genome in population:
+        #     population_fitness[agent_genome] = output[idx][0]
+        #     idx+=1
 
         fitness_time += r_timer.stop()
+
 
         r_timer.start()
 
@@ -203,19 +246,20 @@ def run_genetic_algorithm(generations=5000, population_size=100):
 
         population = new_population
 
-    out_file = open("runtime_data-np_5000gen_50inputs.txt", 'a')
-
-    total_time = total_timer.stop()
-    out_file.write("\n\ngenetic algorithm was run on CPU %s\n" % cpuinfo.get_cpu_info()['brand'])
-    out_file.write("%i generations, %i population_size and %i inputs\n" % (generations, population_size, len(all_waypoints)))
-    out_file.write( "total runtime was %f seconds\n" % total_time)
-    out_file.write( "\t total fitness time was %0.2f \n" % (fitness_time*1000))
-    out_file.write( "\t total mutation time was %0.2f milliseconds\n" % (mutate_time*1000))
-    out_file.write( "\t average fitness time was %0.2f milliseconds\n" % ((fitness_time / generations)*1000))
-    out_file.write( "\t average mutate time was %0.2f milliseconds\n" % ((mutate_time / generations)*1000))
-    out_file.write( "\t %0.3f percent of the total runtime was fitness\n" % ((fitness_time / total_time) * 100))
-    out_file.write( "\t %0.3f percent of the total runtime was mutations\n" % ((mutate_time / total_time) * 100))
-    out_file.write(" best solution was fitness %d" % best )
+    # out_file = open("runtime_data-np_5000gen_50inputs.txt", 'a')
+    #
+    # total_time = total_timer.stop()
+    # #out_file.write("\n\ngenetic algorithm was run on CPU %s\n" % cpuinfo.get_cpu_info()['brand'])
+    # out_file.write("\n\ngenetic algorithm was run on CPU \n")
+    # out_file.write("%i generations, %i population_size and %i inputs\n" % (generations, population_size, len(all_waypoints)))
+    # out_file.write( "total runtime was %f seconds\n" % total_time)
+    # out_file.write( "\t total fitness time was %0.2f \n" % (fitness_time*1000))
+    # out_file.write( "\t total mutation time was %0.2f milliseconds\n" % (mutate_time*1000))
+    # out_file.write( "\t average fitness time was %0.2f milliseconds\n" % ((fitness_time / generations)*1000))
+    # out_file.write( "\t average mutate time was %0.2f milliseconds\n" % ((mutate_time / generations)*1000))
+    # out_file.write( "\t %0.3f percent of the total runtime was fitness\n" % ((fitness_time / total_time) * 100))
+    # out_file.write( "\t %0.3f percent of the total runtime was mutations\n" % ((mutate_time / total_time) * 100))
+    # out_file.write(" best solution was fitness %d" % best )
 
 
 if __name__ == '__main__':
@@ -237,7 +281,7 @@ if __name__ == '__main__':
 
     num_items = len(names_lookup)
 
-    adj_matrix = np.zeros(shape=[num_items, num_items ]) #CHANGE BACK TO EMPTY
+    adj_matrix = np.zeros(shape=[num_items, num_items ])
 
     for i, row in waypoint_data.iterrows():
         #TODO: translate waypoints and place dist in adj_matrix
@@ -254,4 +298,4 @@ if __name__ == '__main__':
    # print adj_matrix[13,1]
 
 
-    run_genetic_algorithm(5000, 100)
+    run_genetic_algorithm(2, 100)
